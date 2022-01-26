@@ -53,7 +53,7 @@ wholeaked works with every file type. However, it has additional features for co
 
 ### Validation Part
 
-To find who leaked the document, you just need to provide the leaked file to wholeaked and it will reveal the responsible person by comparing the signatures in the database.
+To find who leaked the document, you just need to provide the leaked file to wholeaked, and it will reveal the responsible person by comparing the signatures in the database.
 
 ```
 +-----------+             +---------+                           
@@ -78,11 +78,11 @@ wholeaked can add the unique signature to different sections of a file. Availabl
 
 **File Hash:** SHA256 hash of the file. All file types are supported. 
 
-**Binary:** The signature is directly added to the binary. *Almost* all filetypes are supported.
+**Binary:** The signature is directly added to the binary. *Almost* all file types are supported.
 
 **Metadata:** The signature is added to a metadata section of a file. Supported file types: PDF, DOCX, XLSX, PPTX, MOV, JPG, PNG, GIF, EPS, AI, PSD
 
-**Watermark:** An invisible signature is inserted to the text. Only PDF files are supported.
+**Watermark:** An invisible signature is inserted into the text. Only PDF files are supported.
 
 # Installation
 
@@ -119,7 +119,7 @@ wholeaked requires `pdftotext` for verifying watermarks inside PDF files. If you
 
 ## Basic Usage
 
-wholeaked requires a project name `-n`, path of the base file which the signatures will added `-f` and a list of target recipients `-t`
+wholeaked requires a project name `-n`, the path of the base file which the signatures will add `-f` and a list of target recipients `-t`
 
 Example command: `./wholeaked -n test_project -f secret.pdf -t targets.txt`
 
