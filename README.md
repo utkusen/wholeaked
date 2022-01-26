@@ -15,7 +15,7 @@ wholeaked is a file-sharing tool that allows you to find the responsible person 
 
 ## How?
 
-wholeaked gets the file that will be shared and a list of recipients. It creates a unique signature for each recipient and adds it to the file secretly. After then, you can automatically send files to the corresponding recipients by using Sendgrid, AWS SES or SMTP integrations. Instead of sending them by e-mail, you can also share them manually.
+wholeaked gets the file that will be shared and a list of recipients. It creates a unique signature for each recipient and adds it to the file secretly. After then, it can automatically send files to the corresponding recipients by using Sendgrid, AWS SES or SMTP integrations. Instead of sending them by e-mail, you can also share them manually.
 
 wholeaked works with every file type. However, it has additional features for common file types such as PDF, DOCX, MOV etc.
 
