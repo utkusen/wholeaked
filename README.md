@@ -90,7 +90,7 @@ wholeaked can add the unique signature to different sections of a file. Availabl
 
 You can download the pre-built binaries from the [releases](https://github.com/utkusen/wholeaked/releases/latest) page and run. For example:
 
-`tar xzvf wholeaked_0.1.0_Linux_amd64.tar.gz`
+`unzip wholeaked_0.1.0_macOS_amd64.zip`
 
 `./wholeaked --help`
 
