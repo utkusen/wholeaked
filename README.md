@@ -78,7 +78,7 @@ wholeaked can add the unique signature to different sections of a file. Availabl
 
 **File Hash:** SHA256 hash of the file. All file types are supported. 
 
-**Binary:** The signature is added to the binary of a file. *Almost* all filetypes are supported.
+**Binary:** The signature is directly added to the binary. *Almost* all filetypes are supported.
 
 **Metadata:** The signature is added to a metadata section of a file. Supported file types: PDF, DOCX, XLSX, PPTX, MOV, JPG, PNG, GIF, EPS, AI, PSD
 
