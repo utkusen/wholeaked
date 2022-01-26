@@ -1,0 +1,4 @@
+Dear {{Name}} <br><br>
+
+A file is shared with <b>you</b>. You can find it in the attachment.
+
