@@ -698,8 +698,8 @@ func sendWithSendgrid(toName, toEmail, fromName, fromEmail, subject, bodyFile, c
 					fmt.Println(err)
 					os.Exit(1)
 				}
-				defer f.Close()
 				contentType := GetFileContentType(f)
+				f.Close()
 				attachmentFile := mail.NewAttachment()
 				dat, err := ioutil.ReadFile(attachment)
 				if err != nil {
