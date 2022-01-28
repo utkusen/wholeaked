@@ -82,7 +82,7 @@ func main() {
 
 }
 
-func startProcess(baseFile string, targetsFile string, projectName string, binaryFlag bool, metadataFlag bool, watermarkFlag bool, sendgridFlag bool, sesFlag bool, smtpFlag bool, validateFlag bool) {
+func startProcess(baseFile, targetsFile, projectName string, binaryFlag, metadataFlag, watermarkFlag, sendgridFlag, sesFlag, smtpFlag, validateFlag bool) {
 	fmt.Println("Operation started")
 	projectDir := filepath.Join(currentDir, projectName)
 	dbPath := filepath.Join(projectDir, "db.csv")
@@ -151,7 +151,7 @@ func startProcess(baseFile string, targetsFile string, projectName string, binar
 
 }
 
-func detectWatermarkPDF(file string, signature string) bool {
+func detectWatermarkPDF(file, signature string) bool {
 	operatingSystem := runtime.GOOS
 	var cmd *exec.Cmd
 	if operatingSystem == "windows" {
@@ -167,7 +167,7 @@ func detectWatermarkPDF(file string, signature string) bool {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	outPath := strings.Replace(file, ".pdf", ".txt", -1)
+	outPath := strings.ReplaceAll(file, ".pdf", ".txt")
 	content, err := ioutil.ReadFile(outPath)
 	if err != nil {
 		color.Red("Couldn't read the PDF file")
@@ -180,19 +180,19 @@ func detectWatermarkPDF(file string, signature string) bool {
 	return strings.Contains(text, signature)
 }
 
-func addWatermarkPDF(file string, signature string) {
+func addWatermarkPDF(file, signature string) {
 	onTop := false
 	update := false
 	wm, _ := api.TextWatermark(signature, "sc:.9, rot:0, mo:1, op:0", onTop, update, pdfcpu.POINTS)
 	api.AddWatermarksFile(file, "", nil, wm, nil)
 }
 
-func detectLeak(file string, dbPath string) {
+func detectLeak(file, dbPath string) {
 	targets := readTargets(dbPath)
 	foundFlag := false
 	for _, target := range targets {
 		signature := strings.Split(target, ",")[2]
-		name := strings.Replace(strings.Split(target, ",")[0], " ", "_", -1)
+		name := strings.ReplaceAll(strings.Split(target, ",")[0], " ", "_")
 		fileHash := strings.Split(target, ",")[3]
 		binaryFlag, hashFlag, metadataFlag, watermarkFlag := detectSignature(file, signature, fileHash)
 		if hashFlag {
@@ -233,7 +233,7 @@ func getHash(file string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func applySignature(file string, signature string, binaryFlag bool, metadataFlag bool, watermarkFlag bool) {
+func applySignature(file, signature string, binaryFlag, metadataFlag, watermarkFlag bool) {
 	extension := filepath.Ext(file)
 	if extension == ".pdf" && watermarkFlag {
 		addWatermarkPDF(file, signature)
@@ -249,7 +249,7 @@ func applySignature(file string, signature string, binaryFlag bool, metadataFlag
 
 }
 
-func appendSignature(file string, signature string) {
+func appendSignature(file, signature string) {
 	signature = " " + signature
 	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -280,7 +280,7 @@ func listFiles(root string) ([]string, error) {
 
 }
 
-func addMetadataSignature(file string, signature string) {
+func addMetadataSignature(file, signature string) {
 	var metaSection string
 	extension := filepath.Ext(file)
 	if extension == ".docx" || extension == ".xlsx" || extension == ".pptx" {
@@ -343,7 +343,7 @@ func addMetadataSignature(file string, signature string) {
 	}
 }
 
-func officeCompress(source string, target string) {
+func officeCompress(source, target string) {
 	files, err := listFiles(source)
 	if err != nil {
 		fmt.Println(err)
@@ -384,7 +384,7 @@ func officeCompress(source string, target string) {
 	}
 }
 
-func exifRead(file string, field string) string {
+func exifRead(file, field string) string {
 	et, err := exiftool.NewExiftool()
 	if err != nil {
 		fmt.Printf("Error when intializing: %v\n", err)
@@ -431,7 +431,7 @@ func copyFile(src, dest string) (err error) {
 	return nil
 }
 
-func detectSignature(file string, signature string, hashValue string) (bool, bool, bool, bool) {
+func detectSignature(file, signature, hashValue string) (bool, bool, bool, bool) {
 	binaryFlag := false
 	hashFlag := false
 	metadataFlag := false
@@ -536,7 +536,7 @@ func generateTargetDB(file string, targets []string) {
 	}
 }
 
-func createLocalFiles(baseFile string, projectName string, binaryFlag bool, metadataFlag bool, watermarkFlag bool) {
+func createLocalFiles(baseFile, projectName string, binaryFlag, metadataFlag, watermarkFlag bool) {
 	currentDir, _ := os.Getwd()
 	projectDir := filepath.Join(currentDir, projectName)
 	fileDir := filepath.Join(projectDir, "files")
@@ -551,7 +551,7 @@ func createLocalFiles(baseFile string, projectName string, binaryFlag bool, meta
 	for _, target := range targets {
 		if target != "" {
 			signature := strings.Split(target, ",")[2]
-			name := strings.Replace(strings.Split(target, ",")[0], " ", "_", -1)
+			name := strings.ReplaceAll(strings.Split(target, ",")[0], " ", "_")
 			privateDir := filepath.Join(fileDir, name)
 			err := os.Mkdir(privateDir, 0777)
 			if err != nil {
@@ -560,7 +560,7 @@ func createLocalFiles(baseFile string, projectName string, binaryFlag bool, meta
 				os.Exit(1)
 			}
 			fileLocation := filepath.Join(privateDir, filepath.Base(baseFile))
-			_ = CopyFile(baseFile, fileLocation)
+			_ = CopyTargetFile(baseFile, fileLocation)
 			applySignature(fileLocation, signature, binaryFlag, metadataFlag, watermarkFlag)
 			fileHash = getHash(fileLocation)
 			updatedDB += target + "," + fileHash + "," + fileLocation + "\n"
@@ -575,7 +575,7 @@ func createLocalFiles(baseFile string, projectName string, binaryFlag bool, meta
 	}
 }
 
-func CopyFile(src, dst string) error {
+func CopyTargetFile(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
 		return err
@@ -594,7 +594,7 @@ func CopyFile(src, dst string) error {
 	return cerr
 }
 
-func Unzip(src string, destination string) ([]string, error) {
+func Unzip(src, destination string) ([]string, error) {
 	var filenames []string
 	r, err := zip.OpenReader(src)
 	if err != nil {
@@ -651,7 +651,7 @@ func GetFileContentType(out *os.File) string {
 	return contentType
 }
 
-func sendWithSendgrid(toName string, toEmail string, fromName string, fromEmail string, subject string, bodyFile string, contentType string, attachment string) {
+func sendWithSendgrid(toName, toEmail, fromName, fromEmail, subject, bodyFile, contentType, attachment string) {
 	configFile, err := os.Open("CONFIG")
 	if err != nil {
 		color.Red("Can't read the CONFIG file")
@@ -662,7 +662,7 @@ func sendWithSendgrid(toName string, toEmail string, fromName string, fromEmail 
 	scanner := bufio.NewScanner(configFile)
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), "SENDGRID_API_KEY") {
-			apiKey := strings.TrimSpace(strings.Replace(strings.Split(scanner.Text(), "=")[1], "\"", "", -1))
+			apiKey := strings.TrimSpace(strings.ReplaceAll(strings.Split(scanner.Text(), "=")[1], "\"", ""))
 			if apiKey == "" {
 				fmt.Println("No Sendgrid API Key is set in the CONFIG file")
 				os.Exit(1)
@@ -674,7 +674,7 @@ func sendWithSendgrid(toName string, toEmail string, fromName string, fromEmail 
 					os.Exit(1)
 				}
 				m := mail.NewV3Mail()
-				newBody := strings.Replace(string(body), "{{Name}}", toName, -1)
+				newBody := strings.ReplaceAll(string(body), "{{Name}}", toName)
 				from := mail.NewEmail(fromName, fromEmail)
 				to := mail.NewEmail(toName, toEmail)
 				content := mail.NewContent("text/plain", newBody)
@@ -735,7 +735,7 @@ func sendWithSendgrid(toName string, toEmail string, fromName string, fromEmail 
 	}
 }
 
-func sendWithSES(toName string, toEmail string, fromName string, fromEmail string, subject string, bodyFile string, contentType string, attachment string, region string) {
+func sendWithSES(toName, toEmail, fromName, fromEmail, subject, bodyFile, contentType, attachment, region string) {
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String(region)},
 	)
@@ -750,7 +750,7 @@ func sendWithSES(toName string, toEmail string, fromName string, fromEmail strin
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	newBody := strings.Replace(string(body), "{{Name}}", toName, -1)
+	newBody := strings.ReplaceAll(string(body), "{{Name}}", toName)
 	msg := gomail.NewMessage()
 	svc := ses.New(sess)
 	msg.SetAddressHeader("From", fromEmail, fromName)
@@ -789,7 +789,7 @@ func sendWithSES(toName string, toEmail string, fromName string, fromEmail strin
 	color.Green("Email sent successfully to : " + toName + " (" + toEmail + ")")
 }
 
-func sendWithSMTP(toName string, toEmail string, fromName string, fromEmail string, subject string, bodyFile string, contentType string, attachment string) {
+func sendWithSMTP(toName, toEmail, fromName, fromEmail, subject, bodyFile, contentType, attachment string) {
 	configs := parseConfigFile()
 
 	if configs["SMTP_SERVER"] == "" {
@@ -812,7 +812,7 @@ func sendWithSMTP(toName string, toEmail string, fromName string, fromEmail stri
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	newBody := strings.Replace(string(body), "{{Name}}", toName, -1)
+	newBody := strings.ReplaceAll(string(body), "{{Name}}", toName)
 	if contentType == "text" {
 		m.SetBody("text/plain", newBody)
 	} else if contentType == "html" {
@@ -852,7 +852,7 @@ func parseConfigFile() map[string]string {
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), "=") {
 			key := strings.TrimSpace(strings.Split(scanner.Text(), "=")[0])
-			value := strings.TrimSpace(strings.Replace(strings.Split(scanner.Text(), "=")[1], "\"", "", -1))
+			value := strings.TrimSpace(strings.ReplaceAll(strings.Split(scanner.Text(), "=")[1], "\"", ""))
 			config[key] = value
 		}
 	}
