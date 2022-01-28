@@ -181,9 +181,7 @@ func detectWatermarkPDF(file, signature string) bool {
 }
 
 func addWatermarkPDF(file, signature string) {
-	onTop := false
-	update := false
-	wm, _ := api.TextWatermark(signature, "sc:.9, rot:0, mo:1, op:0", onTop, update, pdfcpu.POINTS)
+	wm, _ := api.TextWatermark(signature, "sc:.9, rot:0, mo:1, op:0", false, false, pdfcpu.POINTS)
 	api.AddWatermarksFile(file, "", nil, wm, nil)
 }
 
