@@ -168,6 +168,7 @@ func detectWatermarkPDF(file, signature string) bool {
 		os.Exit(1)
 	}
 	outPath := strings.ReplaceAll(file, ".pdf", ".txt")
+	defer os.Remove(outPath)
 	content, err := ioutil.ReadFile(outPath)
 	if err != nil {
 		color.Red("Couldn't read the PDF file")
@@ -176,7 +177,6 @@ func detectWatermarkPDF(file, signature string) bool {
 	}
 
 	text := string(content)
-	os.Remove(outPath)
 	return strings.Contains(text, signature)
 }
 
